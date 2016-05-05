@@ -25,8 +25,10 @@ fn main() {
                                     .required(true)
                                     .takes_value(true)
                                     //.conflicts_with("bar")      
+                                        //error: cannot require and conflict with same arg
                                     .requires("bar")
                                     //.conflicts_with("x")
+                                        //error: not a valid arg name
                             )
                         .arg(Arg::with_name("bar")
                                     .short("b")
