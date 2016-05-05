@@ -7,6 +7,7 @@
 ////     simplicity and readability.
 //// Comments with '////' are mine
 //// License (for both projects): MIT
+//// For slightly modified version (which passes original tests),//// see https://github.com/stensonowen/coreutils/tree/master/src/wc
 
 
 ////ORIGINAL HEADER:
