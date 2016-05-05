@@ -65,7 +65,20 @@ pub struct App<'a, 'b> where 'a: 'b {
 
 impl<'a, 'b> App<'a, 'b> {
 
-    #[allow(missing_docs)]
+    /// Performs check of argument compability. Follows chain of required/mutually 
+    /// exclusive arguments and subarguments and verifies there are no fatal conflicts.
+    /// Also checks to be sure that all arguments referenced in the chain actually exist.
+    /// Intended to be used in the debugging process to avoid logic errors, but 
+    /// probably not useful in production code.
+    /// Return value is a Result, and Err option contains error message
+    ///
+    /// # Examples
+    ///
+    /// ```no_run
+    /// # use clap::{App, Arg};
+    /// let app = App::new("test"); //with argument info
+    /// let tst = app.verify();
+    /// ```
     pub fn verify(&self) -> Result<(), String> {
             let mut arguments = HashMap::new();
             let mut required  = HashSet::new();
@@ -84,8 +97,6 @@ impl<'a, 'b> App<'a, 'b> {
             for arg in &self.p.required {
                 required.insert(arg.to_string());
             }
-            //positionals?
-            //groups?
 
             let mut requ_len = 0;
             let mut frbd_len = 0;
@@ -162,11 +173,7 @@ impl<'a, 'b> App<'a, 'b> {
                 }
 
             }
-        //Ok("foo".as_ref())
-        //Ok("foo".to_string())
         Ok(())
-
-        //self
     }
 
     /// Creates a new instance of an application requiring a name. The name may be, but doesn't
