@@ -28,14 +28,14 @@ use args::MatchedArg;
 #[allow(missing_debug_implementations)]
 #[doc(hidden)]
 pub struct Parser<'a, 'b> where 'a: 'b {
-    required: Vec<&'b str>,
+    pub required: Vec<&'b str>,
     short_list: Vec<char>,
     long_list: Vec<&'b str>,
-    blacklist: Vec<&'b str>,
+    pub blacklist: Vec<&'b str>,
     // A list of possible flags
     flags: Vec<FlagBuilder<'a, 'b>>,
     // A list of possible options
-    opts: Vec<OptBuilder<'a, 'b>>,
+    pub opts: Vec<OptBuilder<'a, 'b>>,
     // A list of positional arguments
     positionals: VecMap<PosBuilder<'a, 'b>>,
     // A list of subcommands

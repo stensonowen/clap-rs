@@ -17,7 +17,6 @@ use std::borrow::Borrow;
 use std::result::Result as StdResult;
 use std::rc::Rc;
 use std::fmt;
-use std::collections::{HashSet, HashMap};
 
 #[cfg(feature = "yaml")]
 use yaml_rust::Yaml;
@@ -64,111 +63,6 @@ pub struct App<'a, 'b> where 'a: 'b {
 
 
 impl<'a, 'b> App<'a, 'b> {
-
-    #[allow(missing_docs)]
-    pub fn verify(&self) -> Result<(), String> {
-            let mut arguments = HashMap::new();
-            let mut required  = HashSet::new();
-            let mut forbidden = HashSet::new();
-            let mut required_new = Vec::new();
-            let mut forbidden_new= Vec::new();
-            //convert all arguments to hashmap: easily searched by arg name
-            for opt in &self.p.opts {
-                arguments.insert(opt.name.to_string(), opt.clone()); 
-            }
-            //start list of forbidden arguments
-            for arg in &self.p.blacklist {
-                forbidden.insert(arg.to_string());
-            }
-            //start list of required arguments
-            for arg in &self.p.required {
-                required.insert(arg.to_string());
-            }
-            //positionals?
-            //groups?
-
-            let mut requ_len = 0;
-            let mut frbd_len = 0;
-
-            while !(requ_len == required.len() && frbd_len == forbidden.len()) {
-                requ_len = required.len();
-                frbd_len = forbidden.len();
-                //expand required list by one iteration
-                for arg in &required {
-                    let sub_args = arguments.get(&arg.to_string());
-                    if sub_args.is_some() {
-                        let sub_args = sub_args.unwrap().clone().requires;
-                        for sub_arg in sub_args { 
-                            println!("a");
-                            for sub_arg_ in sub_arg{
-                                //each of these is also required
-                                if forbidden.contains(sub_arg_) {
-                                    return Err(format!("{} was required and forbidden", sub_arg_));
-                                }
-                                if !required.contains(sub_arg_) {
-                                    required_new.push(sub_arg_.to_string());
-                                }
-                            }
-                            println!("aa");
-                        }
-                    }
-                    else {
-                        return Err(format!("Arg '{}' was not found", arg));
-                    }
-                    let sub_args = arguments.get(&arg.to_string());
-                    if sub_args.is_some() {
-                        let sub_args = sub_args.unwrap().clone().blacklist;
-                        for sub_arg in sub_args { 
-                            println!("b");
-                            for sub_arg_ in sub_arg{
-                                //each of these is also forbidden
-                                if required.contains(sub_arg_) {
-                                    return Err(format!("{} was required and forbidden", sub_arg_));
-                                }
-                                if !forbidden.contains(sub_arg_) {
-                                    forbidden_new.push(sub_arg_.to_string());
-                                }
-                            }
-                            println!("bb");
-                        }
-                    }
-                }
-                for rn in &required_new {
-                    required.insert(rn.to_string());
-                }
-
-                for arg in &forbidden {
-                    let sub_args = arguments.get(&arg.to_string());
-                    if sub_args.is_some() {
-                        let sub_args = sub_args.unwrap().clone().requires;
-                        for sub_arg in sub_args {
-                            for sub_arg_ in sub_arg {
-                                //arguments required by forbidden arguments are also forbidden
-                                if required.contains(sub_arg_) {
-                                    return Err(format!("{} was required and forbidden", sub_arg_));
-                                }
-                                if !forbidden.contains(sub_arg_) {
-                                    forbidden_new.push(sub_arg_.to_string());
-                                }
-                            }
-                        }
-                    }
-                    else {
-                        return Err(format!("Arg '{}' was not found", arg));
-                    }
-                }
-                for fbn in &forbidden_new {
-                    forbidden.insert(fbn.to_string());
-                }
-
-            }
-        //Ok("foo".as_ref())
-        //Ok("foo".to_string())
-        Ok(())
-
-        //self
-    }
-
     /// Creates a new instance of an application requiring a name. The name may be, but doesn't
     /// have to be same as the binary. The name will be displayed to the user when they request to
     /// print version or help and usage information.
@@ -902,7 +796,6 @@ impl<'a, 'b> App<'a, 'b> {
         self.p.propogate_globals();
 
         let mut matcher = ArgMatcher::new();
-
 
         let mut it = itr.into_iter();
         // Get the name of the program (argument 1 of env::args()) and determine the
